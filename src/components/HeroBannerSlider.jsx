@@ -34,24 +34,24 @@ export default function HeroBannerSlider({
       theme: 'emerald',
       ctaText: 'Presensi Pengunjung',
       ctaAction: () => onOpenQuickVisitor(),
-      ctaText2: 'Katalog Koleksi',
-      ctaAction2: () => setActiveTab('books'),
+      ctaText2: 'Statistik Koleksi',
+      ctaAction2: () => setActiveTab('statistics'),
       badge: 'TERBUKA UNTUK UMUM'
     },
     {
       id: 2,
       tagline: 'STANDARISASI PENGELOLAAN KOLEKSI DDC & OPAC',
-      headingLeft: 'GENERATOR RESMI',
-      titleHighlight: 'LABEL PUNGGUNG & BARCODE',
+      headingLeft: 'KLASIFIKASI DDC &',
+      titleHighlight: 'PENATAAN RAK KOLEKSI',
       subHighlight: 'STANDAR PERPUSTAKAAN TBM AL ISLAMIYAH',
       quoteRight: 'Penataan Rak Buku yang Presisi dan Mudah Ditemukan Pemustaka',
-      description: 'Cetak otomatis label nomor panggil 4 baris, kode DDC, 3 huruf pengarang, dan barcode Code 128 pada kertas stiker Tom & Jerry atau HVS A4.',
+      description: 'Klasifikasi sistematis dengan nomor panggil standar DDC, 3 huruf pengarang, dan penataan nomor rak agar memudahkan pencarian literasi.',
       theme: 'teal',
-      ctaText: 'Cetak Label Sekarang',
-      ctaAction: () => setActiveTab('labels'),
-      ctaText2: 'Kelola Data Buku',
-      ctaAction2: () => setActiveTab('books'),
-      badge: 'FORMAT TOM & JERRY SIAP CETAK'
+      ctaText: 'Isi Presensi Hadir',
+      ctaAction: () => onOpenQuickVisitor(),
+      ctaText2: 'Lihat Statistik Buku',
+      ctaAction2: () => setActiveTab('statistics'),
+      badge: 'KLASIFIKASI DDC RESMI'
     },
     {
       id: 3,
@@ -60,13 +60,13 @@ export default function HeroBannerSlider({
       titleHighlight: 'PRESENSI PEMUSTAKA',
       subHighlight: 'REKAPITULASI REAL-TIME',
       quoteRight: 'Mencatat Setiap Langkah Pembaca Menuju Cakrawala Ilmu',
-      description: 'Form kehadiran interaktif dengan filter kategori santri, guru, mahasiswa, dan warga serta ekspor rekap data ke Microsoft Excel.',
+      description: 'Form kehadiran interaktif dengan filter kategori santri, guru, mahasiswa, dan warga yang langsung terhubung ke Google Drive.',
       theme: 'cyan',
       ctaText: 'Catat Pengunjung Baru',
       ctaAction: () => onOpenQuickVisitor(),
-      ctaText2: 'Lihat Rekap Presensi',
-      ctaAction2: () => setActiveTab('visitors'),
-      badge: 'EKSPOR EXCEL & CSV'
+      ctaText2: 'Statistik Pengunjung',
+      ctaAction2: () => setActiveTab('statistics'),
+      badge: 'SINKRON GOOGLE DRIVE'
     }
   ];
 

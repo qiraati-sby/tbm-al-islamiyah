@@ -78,8 +78,8 @@ export default function DashboardView({
           </div>
           <div className="mt-2 text-xs text-slate-500 flex items-center justify-between">
             <span>Total riwayat: <b>{visitors.length}</b> kunjungan</span>
-            <button onClick={() => setActiveTab('visitors')} className="text-emerald-600 font-semibold hover:underline flex items-center gap-0.5 cursor-pointer">
-              Lihat <ArrowRight className="w-3 h-3" />
+            <button onClick={() => setActiveTab('statistics')} className="text-emerald-600 font-semibold hover:underline flex items-center gap-0.5 cursor-pointer">
+              Statistik <ArrowRight className="w-3 h-3" />
             </button>
           </div>
         </div>
@@ -87,7 +87,7 @@ export default function DashboardView({
         {/* Card 2 */}
         <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs hover:border-emerald-300 transition-colors">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Katalog Bahan Pustaka</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Koleksi Bahan Pustaka</span>
             <div className="p-2.5 rounded-lg bg-teal-50 text-teal-600">
               <BookOpen className="w-5 h-5" />
             </div>
@@ -98,8 +98,8 @@ export default function DashboardView({
           </div>
           <div className="mt-2 text-xs text-slate-500 flex items-center justify-between">
             <span>Tersedia: <b className="text-emerald-600">{availableCopies}</b> eks</span>
-            <button onClick={() => setActiveTab('books')} className="text-teal-600 font-semibold hover:underline flex items-center gap-0.5 cursor-pointer">
-              Katalog <ArrowRight className="w-3 h-3" />
+            <button onClick={() => setActiveTab('statistics')} className="text-teal-600 font-semibold hover:underline flex items-center gap-0.5 cursor-pointer">
+              Statistik <ArrowRight className="w-3 h-3" />
             </button>
           </div>
         </div>
@@ -118,8 +118,8 @@ export default function DashboardView({
           </div>
           <div className="mt-2 text-xs text-slate-500 flex items-center justify-between">
             <span>Sirkulasi pemustaka</span>
-            <button onClick={() => setActiveTab('circulation')} className="text-amber-600 font-semibold hover:underline flex items-center gap-0.5 cursor-pointer">
-              Sirkulasi <ArrowRight className="w-3 h-3" />
+            <button onClick={() => setActiveTab('statistics')} className="text-amber-600 font-semibold hover:underline flex items-center gap-0.5 cursor-pointer">
+              Statistik <ArrowRight className="w-3 h-3" />
             </button>
           </div>
         </div>
@@ -127,19 +127,19 @@ export default function DashboardView({
         {/* Card 4 */}
         <div className="bg-white rounded-xl p-5 border border-slate-200/80 shadow-xs hover:border-emerald-300 transition-colors">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Label & Barcode</span>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Klasifikasi & Kategori</span>
             <div className="p-2.5 rounded-lg bg-indigo-50 text-indigo-600">
-              <Tag className="w-5 h-5" />
+              <Layers className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-[#0b2864]">{books.length}</span>
-            <span className="text-xs text-slate-500">siap cetak</span>
+            <span className="text-3xl font-extrabold text-[#0b2864]">DDC</span>
+            <span className="text-xs text-slate-500">standar resmi</span>
           </div>
           <div className="mt-2 text-xs text-slate-500 flex items-center justify-between">
-            <span>Format Tom & Jerry A4</span>
-            <button onClick={() => setActiveTab('labels')} className="text-indigo-600 font-semibold hover:underline flex items-center gap-0.5 cursor-pointer">
-              Cetak <ArrowRight className="w-3 h-3" />
+            <span>Penataan rak rapi</span>
+            <button onClick={() => setActiveTab('statistics')} className="text-indigo-600 font-semibold hover:underline flex items-center gap-0.5 cursor-pointer">
+              Lihat Data <ArrowRight className="w-3 h-3" />
             </button>
           </div>
         </div>
@@ -166,10 +166,10 @@ export default function DashboardView({
                 <p className="text-xs text-slate-500">Log buku tamu pemustaka yang baru saja hadir di Taman Baca</p>
               </div>
               <button
-                onClick={() => setActiveTab('visitors')}
+                onClick={() => setActiveTab('statistics')}
                 className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 cursor-pointer"
               >
-                Lihat Semua ({visitors.length}) <ArrowRight className="w-3 h-3" />
+                Lihat Statistik ({visitors.length}) <ArrowRight className="w-3 h-3" />
               </button>
             </div>
             

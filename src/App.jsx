@@ -5,6 +5,7 @@ import VisitorsView from './components/VisitorsView';
 import BooksView from './components/BooksView';
 import BookLabelsView from './components/BookLabelsView';
 import CirculationView from './components/CirculationView';
+import StatisticsView from './components/StatisticsView';
 import LoginModal from './components/LoginModal';
 import Footer from './components/Footer';
 import { INITIAL_BOOKS, INITIAL_VISITORS, INITIAL_LOANS, DEFAULT_GDRIVE_SCRIPT_URL } from './data/initialData';
@@ -290,6 +291,14 @@ export default function App() {
           />
         )}
 
+        {activeTab === 'statistics' && (
+          <StatisticsView 
+            books={books} 
+            visitors={visitors} 
+            loans={loans} 
+          />
+        )}
+
         {activeTab === 'visitors' && isAdminLoggedIn && (
           <VisitorsView 
             visitors={visitors} 
@@ -298,7 +307,7 @@ export default function App() {
           />
         )}
 
-        {activeTab === 'books' && (
+        {activeTab === 'books' && isAdminLoggedIn && (
           <BooksView 
             books={books} 
             setBooks={handleUpdateBooks} 
@@ -325,7 +334,7 @@ export default function App() {
         )}
 
         {/* Tampilan Terkunci Jika Pengunjung Mencoba Mengakses Halaman Admin */}
-        {['visitors', 'labels', 'circulation'].includes(activeTab) && !isAdminLoggedIn && (
+        {['books', 'visitors', 'labels', 'circulation'].includes(activeTab) && !isAdminLoggedIn && (
           <div className="bg-white rounded-2xl p-8 sm:p-12 text-center shadow-lg border border-slate-200 max-w-lg mx-auto my-12 space-y-4">
             <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
               <Lock className="w-8 h-8" />

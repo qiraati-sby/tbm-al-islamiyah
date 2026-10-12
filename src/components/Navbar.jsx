@@ -16,7 +16,8 @@ import {
   ExternalLink,
   Lock,
   LogOut,
-  ShieldCheck
+  ShieldCheck,
+  BarChart3
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -137,11 +138,11 @@ export default function Navbar({
         </div>
       </div>
 
-      {/* 2. NAVIGATION BAR (Menu Utama TBM Al Islamiyah: Beranda, Profil, Layanan, Aktivitas) */}
+      {/* 2. NAVIGATION BAR */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <nav className="hidden lg:flex items-center justify-center space-x-1 py-1.5 text-sm">
           
-          {/* Beranda */}
+          {/* Beranda (Publik & Admin) */}
           <button
             onClick={() => setActiveTab('dashboard')}
             className={`px-4 py-2 rounded-lg font-semibold transition-colors cursor-pointer ${
@@ -153,92 +154,93 @@ export default function Navbar({
             Beranda
           </button>
 
-          {/* Katalog & Data Buku (Bisa dilihat publik, kelola oleh admin) */}
+          {/* Menu Statistik (Publik & Admin) */}
           <button
-            onClick={() => setActiveTab('books')}
+            onClick={() => setActiveTab('statistics')}
             className={`px-4 py-2 rounded-lg font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
-              activeTab === 'books'
+              activeTab === 'statistics'
                 ? 'text-white bg-[#143b82] border-b-2 border-emerald-400'
                 : 'text-slate-200 hover:text-white hover:bg-[#143b82]/50'
             }`}
           >
-            <BookOpen className="w-4 h-4 text-emerald-300" />
-            <span>Katalog Buku</span>
-            <span className="text-[10px] text-white/60 font-mono">
-              ({stats?.totalBooks || 0})
-            </span>
+            <BarChart3 className="w-4 h-4 text-amber-300" />
+            <span>Statistik</span>
           </button>
 
-          {/* Data Pengunjung (Presensi) - Khusus Admin */}
-          <button
-            onClick={() => {
-              if (!isAdminLoggedIn) onOpenLogin();
-              else setActiveTab('visitors');
-            }}
-            className={`px-3.5 py-2 rounded-lg font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
-              activeTab === 'visitors'
-                ? 'text-white bg-[#143b82] border-b-2 border-emerald-400'
-                : 'text-slate-200 hover:text-white hover:bg-[#143b82]/50'
-            }`}
-          >
-            <Users className="w-4 h-4 text-emerald-300" />
-            <span>Data Pengunjung</span>
-            {!isAdminLoggedIn ? (
-              <Lock className="w-3 h-3 text-amber-300/80 ml-0.5" />
-            ) : stats?.todayVisitors > 0 ? (
-              <span className="bg-emerald-500 text-slate-950 font-bold text-[10px] px-1.5 py-0.2 rounded-full ml-1">
-                {stats.todayVisitors}
-              </span>
-            ) : null}
-          </button>
+          {/* MENU KHUSUS ADMIN (Hanya Tampil Jika Sudah Login) */}
+          {isAdminLoggedIn && (
+            <>
+              {/* Katalog & Data Buku */}
+              <button
+                onClick={() => setActiveTab('books')}
+                className={`px-3.5 py-2 rounded-lg font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
+                  activeTab === 'books'
+                    ? 'text-white bg-[#143b82] border-b-2 border-emerald-400'
+                    : 'text-slate-200 hover:text-white hover:bg-[#143b82]/50'
+                }`}
+              >
+                <BookOpen className="w-4 h-4 text-emerald-300" />
+                <span>Katalog Buku</span>
+                <span className="text-[10px] text-white/60 font-mono">
+                  ({stats?.totalBooks || 0})
+                </span>
+              </button>
 
-          {/* Label Buku & Barcode - Khusus Admin */}
-          <button
-            onClick={() => {
-              if (!isAdminLoggedIn) onOpenLogin();
-              else setActiveTab('labels');
-            }}
-            className={`px-3.5 py-2 rounded-lg font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
-              activeTab === 'labels'
-                ? 'text-white bg-[#143b82] border-b-2 border-emerald-400'
-                : 'text-slate-200 hover:text-white hover:bg-[#143b82]/50'
-            }`}
-          >
-            <Tag className="w-4 h-4 text-amber-300" />
-            <span>Label & Barcode</span>
-            {!isAdminLoggedIn ? (
-              <Lock className="w-3 h-3 text-amber-300/80 ml-0.5" />
-            ) : (
-              <span className="bg-amber-400 text-slate-950 text-[10px] font-extrabold px-1.5 py-0.2 rounded uppercase">
-                Cetak
-              </span>
-            )}
-          </button>
+              {/* Data Pengunjung (Presensi) */}
+              <button
+                onClick={() => setActiveTab('visitors')}
+                className={`px-3.5 py-2 rounded-lg font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
+                  activeTab === 'visitors'
+                    ? 'text-white bg-[#143b82] border-b-2 border-emerald-400'
+                    : 'text-slate-200 hover:text-white hover:bg-[#143b82]/50'
+                }`}
+              >
+                <Users className="w-4 h-4 text-emerald-300" />
+                <span>Data Pengunjung</span>
+                {stats?.todayVisitors > 0 && (
+                  <span className="bg-emerald-500 text-slate-950 font-bold text-[10px] px-1.5 py-0.2 rounded-full ml-1">
+                    {stats.todayVisitors}
+                  </span>
+                )}
+              </button>
 
-          {/* Sirkulasi Buku - Khusus Admin */}
-          <button
-            onClick={() => {
-              if (!isAdminLoggedIn) onOpenLogin();
-              else setActiveTab('circulation');
-            }}
-            className={`px-3.5 py-2 rounded-lg font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
-              activeTab === 'circulation'
-                ? 'text-white bg-[#143b82] border-b-2 border-emerald-400'
-                : 'text-slate-200 hover:text-white hover:bg-[#143b82]/50'
-            }`}
-          >
-            <Repeat className="w-4 h-4 text-emerald-300" />
-            <span>Sirkulasi Pinjam</span>
-            {!isAdminLoggedIn ? (
-              <Lock className="w-3 h-3 text-amber-300/80 ml-0.5" />
-            ) : stats?.activeLoans > 0 ? (
-              <span className="bg-amber-400 text-slate-950 font-bold text-[10px] px-1.5 py-0.2 rounded-full">
-                {stats.activeLoans}
-              </span>
-            ) : null}
-          </button>
+              {/* Label Buku & Barcode */}
+              <button
+                onClick={() => setActiveTab('labels')}
+                className={`px-3.5 py-2 rounded-lg font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
+                  activeTab === 'labels'
+                    ? 'text-white bg-[#143b82] border-b-2 border-emerald-400'
+                    : 'text-slate-200 hover:text-white hover:bg-[#143b82]/50'
+                }`}
+              >
+                <Tag className="w-4 h-4 text-amber-300" />
+                <span>Label & Barcode</span>
+                <span className="bg-amber-400 text-slate-950 text-[10px] font-extrabold px-1.5 py-0.2 rounded uppercase">
+                  Cetak
+                </span>
+              </button>
 
-          {/* Pameran Virtual / Info Komunitas TBM Al Islamiyah */}
+              {/* Sirkulasi Buku */}
+              <button
+                onClick={() => setActiveTab('circulation')}
+                className={`px-3.5 py-2 rounded-lg font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
+                  activeTab === 'circulation'
+                    ? 'text-white bg-[#143b82] border-b-2 border-emerald-400'
+                    : 'text-slate-200 hover:text-white hover:bg-[#143b82]/50'
+                }`}
+              >
+                <Repeat className="w-4 h-4 text-emerald-300" />
+                <span>Sirkulasi Pinjam</span>
+                {stats?.activeLoans > 0 && (
+                  <span className="bg-amber-400 text-slate-950 font-bold text-[10px] px-1.5 py-0.2 rounded-full">
+                    {stats.activeLoans}
+                  </span>
+                )}
+              </button>
+            </>
+          )}
+
+          {/* Pameran Virtual / Info Komunitas (Publik & Admin) */}
           <div className="relative group">
             <button
               onClick={() => setActiveTab('dashboard')}
@@ -265,7 +267,7 @@ export default function Navbar({
             ) : (
               <button 
                 onClick={() => { onOpenLogin(); setMobileMenuOpen(false); }}
-                className="text-xs font-bold text-amber-300 flex items-center gap-1 hover:underline"
+                className="text-xs font-bold text-amber-300 flex items-center gap-1 hover:underline cursor-pointer"
               >
                 <Lock className="w-3 h-3" /> Login Admin
               </button>
@@ -280,73 +282,73 @@ export default function Navbar({
           >
             Beranda
           </button>
+
           <button
-            onClick={() => { setActiveTab('books'); setMobileMenuOpen(false); }}
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-between ${
-              activeTab === 'books' ? 'bg-[#143b82] text-white font-bold' : 'text-slate-300'
+            onClick={() => { setActiveTab('statistics'); setMobileMenuOpen(false); }}
+            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${
+              activeTab === 'statistics' ? 'bg-[#143b82] text-white font-bold' : 'text-slate-300'
             }`}
           >
-            <span className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-emerald-400" /> Katalog Koleksi Buku
-            </span>
-            <span className="text-xs text-slate-400">({stats?.totalBooks || 0})</span>
+            <BarChart3 className="w-4 h-4 text-amber-400" /> Statistik Koleksi & Pemustaka
           </button>
-          <button
-            onClick={() => { 
-              if (!isAdminLoggedIn) onOpenLogin();
-              else setActiveTab('visitors'); 
-              setMobileMenuOpen(false); 
-            }}
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-between ${
-              activeTab === 'visitors' ? 'bg-[#143b82] text-white font-bold' : 'text-slate-300'
-            }`}
-          >
-            <span className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-emerald-400" /> Data Pengunjung
-              {!isAdminLoggedIn && <Lock className="w-3 h-3 text-amber-300/80" />}
-            </span>
-            {isAdminLoggedIn && stats?.todayVisitors > 0 && (
-              <span className="bg-emerald-500 text-slate-950 text-xs px-2 py-0.5 rounded-full font-bold">
-                {stats.todayVisitors}
-              </span>
-            )}
-          </button>
-          <button
-            onClick={() => { 
-              if (!isAdminLoggedIn) onOpenLogin();
-              else setActiveTab('labels'); 
-              setMobileMenuOpen(false); 
-            }}
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-between ${
-              activeTab === 'labels' ? 'bg-[#143b82] text-white font-bold' : 'text-slate-300'
-            }`}
-          >
-            <span className="flex items-center gap-2">
-              <Tag className="w-4 h-4 text-amber-400" /> Label Buku & Barcode
-              {!isAdminLoggedIn && <Lock className="w-3 h-3 text-amber-300/80" />}
-            </span>
-            <span className="bg-amber-400 text-slate-950 text-[10px] font-bold px-1.5 py-0.5 rounded">
-              Cetak
-            </span>
-          </button>
-          <button
-            onClick={() => { 
-              if (!isAdminLoggedIn) onOpenLogin();
-              else setActiveTab('circulation'); 
-              setMobileMenuOpen(false); 
-            }}
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-between ${
-              activeTab === 'circulation' ? 'bg-[#143b82] text-white font-bold' : 'text-slate-300'
-            }`}
-          >
-            <span className="flex items-center gap-2">
-              <Repeat className="w-4 h-4 text-emerald-400" /> Sirkulasi Pinjam
-              {!isAdminLoggedIn && <Lock className="w-3 h-3 text-amber-300/80" />}
-            </span>
-            {isAdminLoggedIn && stats?.activeLoans > 0 && (
-              <span className="text-xs text-amber-300 font-bold">{stats.activeLoans} aktif</span>
-            )}
-          </button>
+
+          {/* MENU KHUSUS ADMIN DI MOBILE */}
+          {isAdminLoggedIn && (
+            <>
+              <button
+                onClick={() => { setActiveTab('books'); setMobileMenuOpen(false); }}
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-between ${
+                  activeTab === 'books' ? 'bg-[#143b82] text-white font-bold' : 'text-slate-300'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-emerald-400" /> Katalog Koleksi Buku
+                </span>
+                <span className="text-xs text-slate-400">({stats?.totalBooks || 0})</span>
+              </button>
+              <button
+                onClick={() => { setActiveTab('visitors'); setMobileMenuOpen(false); }}
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-between ${
+                  activeTab === 'visitors' ? 'bg-[#143b82] text-white font-bold' : 'text-slate-300'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-emerald-400" /> Data Pengunjung
+                </span>
+                {stats?.todayVisitors > 0 && (
+                  <span className="bg-emerald-500 text-slate-950 text-xs px-2 py-0.5 rounded-full font-bold">
+                    {stats.todayVisitors}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={() => { setActiveTab('labels'); setMobileMenuOpen(false); }}
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-between ${
+                  activeTab === 'labels' ? 'bg-[#143b82] text-white font-bold' : 'text-slate-300'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Tag className="w-4 h-4 text-amber-400" /> Label Buku & Barcode
+                </span>
+                <span className="bg-amber-400 text-slate-950 text-[10px] font-bold px-1.5 py-0.5 rounded">
+                  Cetak
+                </span>
+              </button>
+              <button
+                onClick={() => { setActiveTab('circulation'); setMobileMenuOpen(false); }}
+                className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-between ${
+                  activeTab === 'circulation' ? 'bg-[#143b82] text-white font-bold' : 'text-slate-300'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Repeat className="w-4 h-4 text-emerald-400" /> Sirkulasi Pinjam
+                </span>
+                {stats?.activeLoans > 0 && (
+                  <span className="text-xs text-amber-300 font-bold">{stats.activeLoans} aktif</span>
+                )}
+              </button>
+            </>
+          )}
 
           {/* Keluar di Mobile jika Admin */}
           {isAdminLoggedIn && (
