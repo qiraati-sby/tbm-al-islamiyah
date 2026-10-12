@@ -6,6 +6,7 @@ import BooksView from './components/BooksView';
 import BookLabelsView from './components/BookLabelsView';
 import CirculationView from './components/CirculationView';
 import DataBackupModal from './components/DataBackupModal';
+import LoginModal from './components/LoginModal';
 import Footer from './components/Footer';
 import { INITIAL_BOOKS, INITIAL_VISITORS, INITIAL_LOANS, DEFAULT_GDRIVE_SCRIPT_URL } from './data/initialData';
 import { syncVisitorToGoogleDrive } from './utils/googleSync';
@@ -18,7 +19,8 @@ import {
   Phone, 
   Clock, 
   BookOpen, 
-  Users 
+  Users,
+  Lock
 } from 'lucide-react';
 
 export default function App() {
@@ -63,6 +65,31 @@ export default function App() {
   const [isQuickVisitorOpen, setIsQuickVisitorOpen] = useState(false);
   const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
   const [isHelpChatOpen, setIsHelpChatOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  // Admin login state — persisted di sessionStorage (reset saat browser ditutup)
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(() => {
+    return sessionStorage.getItem('tbm_admin_session') === 'true';
+  });
+
+  const handleAdminLogin = (username, password) => {
+    // Kredensial admin — bisa diganti sesuai kebutuhan
+    if (username === 'admin' && password === 'tbm2025') {
+      sessionStorage.setItem('tbm_admin_session', 'true');
+      setIsAdminLoggedIn(true);
+      setIsLoginModalOpen(false);
+      showToast('✅ Login berhasil! Selamat datang, Admin.');
+      return true;
+    }
+    return false;
+  };
+
+  const handleAdminLogout = () => {
+    sessionStorage.removeItem('tbm_admin_session');
+    setIsAdminLoggedIn(false);
+    setActiveTab('dashboard');
+    showToast('Anda telah keluar dari sesi admin.');
+  };
 
   // Toast notification
   const [toastMessage, setToastMessage] = useState(null);
@@ -183,6 +210,13 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col font-sans">
       
+      {/* Login Admin Modal */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLogin={handleAdminLogin}
+      />
+
       {/* Toast Notification Alert */}
       {toastMessage && (
         <div className="fixed bottom-20 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs sm:text-sm animate-in slide-in-from-bottom duration-200 border border-slate-700">
@@ -198,12 +232,23 @@ export default function App() {
       <Navbar 
         activeTab={activeTab} 
         setActiveTab={(tab) => {
+          // Jika tab admin dan belum login, buka modal login
+          if (['visitors','books','labels','circulation'].includes(tab) && !isAdminLoggedIn) {
+            setIsLoginModalOpen(true);
+            return;
+          }
           setActiveTab(tab);
           if (tab !== 'labels') setLabelPreselectedBook(null);
         }} 
         onOpenQuickVisitor={() => setIsQuickVisitorOpen(true)}
-        onOpenBackup={() => setIsBackupModalOpen(true)}
+        onOpenBackup={() => {
+          if (!isAdminLoggedIn) { setIsLoginModalOpen(true); return; }
+          setIsBackupModalOpen(true);
+        }}
         stats={stats}
+        isAdminLoggedIn={isAdminLoggedIn}
+        onOpenLogin={() => setIsLoginModalOpen(true)}
+        onLogout={handleAdminLogout}
       />
 
       {/* Main Content Area */}
@@ -215,13 +260,16 @@ export default function App() {
             loans={loans} 
             setActiveTab={setActiveTab}
             onOpenQuickVisitor={() => setIsQuickVisitorOpen(true)}
-            onOpenAddBook={() => setActiveTab('books')}
+            onOpenAddBook={() => {
+              if (!isAdminLoggedIn) { setIsLoginModalOpen(true); return; }
+              setActiveTab('books');
+            }}
             onNavigateToLabels={handleNavigateToLabels}
             onOpacSearch={handleOpacSearch}
           />
         )}
 
-        {activeTab === 'visitors' && (
+        {activeTab === 'visitors' && isAdminLoggedIn && (
           <VisitorsView 
             visitors={visitors} 
             setVisitors={setVisitors} 
@@ -234,17 +282,19 @@ export default function App() {
             books={books} 
             setBooks={setBooks} 
             onNavigateToLabels={handleNavigateToLabels} 
+            isAdmin={isAdminLoggedIn}
+            onRequireLogin={() => setIsLoginModalOpen(true)}
           />
         )}
 
-        {activeTab === 'labels' && (
+        {activeTab === 'labels' && isAdminLoggedIn && (
           <BookLabelsView 
             books={books} 
             preselectedBook={labelPreselectedBook} 
           />
         )}
 
-        {activeTab === 'circulation' && (
+        {activeTab === 'circulation' && isAdminLoggedIn && (
           <CirculationView 
             loans={loans} 
             setLoans={setLoans} 
@@ -252,7 +302,36 @@ export default function App() {
             setBooks={setBooks} 
           />
         )}
+
+        {/* Tampilan Terkunci Jika Pengunjung Mencoba Mengakses Halaman Admin */}
+        {['visitors', 'labels', 'circulation'].includes(activeTab) && !isAdminLoggedIn && (
+          <div className="bg-white rounded-2xl p-8 sm:p-12 text-center shadow-lg border border-slate-200 max-w-lg mx-auto my-12 space-y-4">
+            <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+              <Lock className="w-8 h-8" />
+            </div>
+            <h3 className="text-xl font-black text-slate-900">Area Khusus Petugas / Admin</h3>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Menu ini memerlukan akses resmi pengelola TBM Al Islamiyah Surabaya untuk menjaga keamanan dan privasi data.
+            </p>
+            <div className="pt-2 flex flex-wrap justify-center gap-3">
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
+              >
+                Kembali ke Beranda
+              </button>
+              <button
+                onClick={() => setIsLoginModalOpen(true)}
+                className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#0b2864] hover:bg-[#143b82] active:scale-95 text-white shadow-md transition-all cursor-pointer flex items-center gap-2"
+              >
+                <Lock className="w-4 h-4 text-amber-300" />
+                <span>Login Admin Sekarang</span>
+              </button>
+            </div>
+          </div>
+        )}
       </main>
+
 
       {/* FLOATING LIVE CHAT / BANTUAN BUTTON (Tombol Bantuan Pojok Kanan Bawah) */}
       <div className="no-print fixed bottom-5 right-5 z-40">

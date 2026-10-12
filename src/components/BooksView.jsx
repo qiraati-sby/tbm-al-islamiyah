@@ -14,14 +14,17 @@ import {
   LayoutGrid,
   List,
   Sparkles,
-  X
+  X,
+  Lock
 } from 'lucide-react';
 import { DEFAULT_CATEGORIES, DEFAULT_RACKS } from '../data/initialData';
 
 export default function BooksView({ 
   books, 
   setBooks, 
-  onNavigateToLabels 
+  onNavigateToLabels,
+  isAdmin = false,
+  onRequireLogin
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
@@ -211,22 +214,34 @@ export default function BooksView({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={handleOpenCreate}
-            className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold px-3.5 py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Tambah Buku Baru</span>
-          </button>
+          {isAdmin ? (
+            <>
+              <button
+                onClick={handleOpenCreate}
+                className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold px-3.5 py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Tambah Buku Baru</span>
+              </button>
 
-          <button
-            onClick={() => onNavigateToLabels(null)}
-            className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-medium px-3 py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 transition-colors cursor-pointer"
-            title="Buka menu cetak label buku"
-          >
-            <Tag className="w-4 h-4" />
-            <span className="hidden sm:inline">Cetak Label Buku</span>
-          </button>
+              <button
+                onClick={() => onNavigateToLabels(null)}
+                className="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-medium px-3 py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 transition-colors cursor-pointer"
+                title="Buka menu cetak label buku"
+              >
+                <Tag className="w-4 h-4" />
+                <span className="hidden sm:inline">Cetak Label Buku</span>
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={onRequireLogin}
+              className="bg-[#0b2864] hover:bg-[#143b82] active:scale-95 text-white font-semibold px-3.5 py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+            >
+              <Lock className="w-4 h-4 text-amber-300" />
+              <span>Kelola Koleksi (Login Admin)</span>
+            </button>
+          )}
 
           <button
             onClick={handleExportCSV}
@@ -324,13 +339,13 @@ export default function BooksView({
                   <th className="py-3 px-4">Kategori & DDC</th>
                   <th className="py-3 px-4">Lokasi Rak</th>
                   <th className="py-3 px-4 text-center">Stok / Status</th>
-                  <th className="py-3 px-4 text-center">Aksi & Label</th>
+                  {isAdmin && <th className="py-3 px-4 text-center">Aksi & Label</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredBooks.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="py-12 text-center text-slate-400">
+                    <td colSpan={isAdmin ? 7 : 6} className="py-12 text-center text-slate-400">
                       <BookOpen className="w-8 h-8 mx-auto mb-2 opacity-40" />
                       <p className="font-medium">Tidak ada buku yang cocok dengan kriteria pencarian</p>
                     </td>
@@ -381,31 +396,33 @@ export default function BooksView({
                           </div>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-center whitespace-nowrap">
-                        <div className="flex items-center justify-center gap-1">
-                          <button
-                            onClick={() => onNavigateToLabels(b)}
-                            className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors"
-                            title="Cetak Label Punggung & Barcode Buku Ini"
-                          >
-                            <Tag className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleOpenEdit(b)}
-                            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
-                            title="Edit data buku"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => setDeleteConfirmId(b.id)}
-                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                            title="Hapus buku"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
+                      {isAdmin && (
+                        <td className="py-3 px-4 text-center whitespace-nowrap">
+                          <div className="flex items-center justify-center gap-1">
+                            <button
+                              onClick={() => onNavigateToLabels(b)}
+                              className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors cursor-pointer"
+                              title="Cetak Label Punggung & Barcode Buku Ini"
+                            >
+                              <Tag className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleOpenEdit(b)}
+                              className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                              title="Edit data buku"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => setDeleteConfirmId(b.id)}
+                              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                              title="Hapus buku"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))
                 )}
@@ -454,30 +471,32 @@ export default function BooksView({
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                <button
-                  onClick={() => onNavigateToLabels(b)}
-                  className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
-                >
-                  <Tag className="w-3.5 h-3.5" /> Cetak Label
-                </button>
-                <div className="flex items-center gap-1">
+              {isAdmin && (
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                   <button
-                    onClick={() => handleOpenEdit(b)}
-                    className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded"
-                    title="Edit"
+                    onClick={() => onNavigateToLabels(b)}
+                    className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer"
                   >
-                    <Edit3 className="w-3.5 h-3.5" />
+                    <Tag className="w-3.5 h-3.5" /> Cetak Label
                   </button>
-                  <button
-                    onClick={() => setDeleteConfirmId(b.id)}
-                    className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded"
-                    title="Hapus"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => handleOpenEdit(b)}
+                      className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded cursor-pointer"
+                      title="Edit"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => setDeleteConfirmId(b.id)}
+                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded cursor-pointer"
+                      title="Hapus"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           ))}
         </div>
