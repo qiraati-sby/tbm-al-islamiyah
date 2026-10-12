@@ -5,11 +5,15 @@ import VisitorsView from './components/VisitorsView';
 import BooksView from './components/BooksView';
 import BookLabelsView from './components/BookLabelsView';
 import CirculationView from './components/CirculationView';
-import DataBackupModal from './components/DataBackupModal';
 import LoginModal from './components/LoginModal';
 import Footer from './components/Footer';
 import { INITIAL_BOOKS, INITIAL_VISITORS, INITIAL_LOANS, DEFAULT_GDRIVE_SCRIPT_URL } from './data/initialData';
-import { syncVisitorToGoogleDrive } from './utils/googleSync';
+import { 
+  fetchDataFromGoogleDrive, 
+  syncVisitorToGoogleDrive, 
+  syncBookToGoogleDrive, 
+  syncAllToGoogleDrive 
+} from './utils/googleSync';
 import { 
   CheckCircle2, 
   UserPlus, 
@@ -63,7 +67,6 @@ export default function App() {
 
   // Modal states
   const [isQuickVisitorOpen, setIsQuickVisitorOpen] = useState(false);
-  const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
   const [isHelpChatOpen, setIsHelpChatOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
@@ -73,7 +76,6 @@ export default function App() {
   });
 
   const handleAdminLogin = (username, password) => {
-    // Kredensial admin — bisa diganti sesuai kebutuhan
     if (username === 'admin' && password === 'tbm2025') {
       sessionStorage.setItem('tbm_admin_session', 'true');
       setIsAdminLoggedIn(true);
@@ -99,7 +101,43 @@ export default function App() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // Sync to LocalStorage
+  // 1. OTOMATIS AMBIL DATA TERBARU DARI GOOGLE DRIVE SAAT WEB DIBUKA & INTERVAL
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadFromGoogleDrive() {
+      try {
+        const data = await fetchDataFromGoogleDrive(DEFAULT_GDRIVE_SCRIPT_URL);
+        if (!data || !isMounted) return;
+
+        if (Array.isArray(data.books)) {
+          setBooks(data.books);
+          localStorage.setItem('tbm_books_data', JSON.stringify(data.books));
+        }
+        if (Array.isArray(data.visitors)) {
+          setVisitors(data.visitors);
+          localStorage.setItem('tbm_visitors_data', JSON.stringify(data.visitors));
+        }
+        if (Array.isArray(data.loans)) {
+          setLoans(data.loans);
+          localStorage.setItem('tbm_loans_data', JSON.stringify(data.loans));
+        }
+      } catch (err) {
+        console.warn('Auto-sync background check:', err);
+      }
+    }
+
+    loadFromGoogleDrive();
+
+    // Auto-update berkala setiap 25 detik agar web otomatis menyesuaikan tanpa klik update manual
+    const interval = setInterval(loadFromGoogleDrive, 25000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Sync to LocalStorage sebagai cache cadangan cepat
   useEffect(() => {
     try {
       localStorage.setItem('tbm_books_data', JSON.stringify(books));
@@ -124,20 +162,23 @@ export default function App() {
     }
   }, [loans]);
 
-  // Handler: Add Visitor
+  // Handler: Add Visitor (Otomatis langsung masuk ke Google Drive)
   const handleAddVisitor = (visitor) => {
-    setVisitors([visitor, ...visitors]);
-    showToast(`Presensi "${visitor.name}" berhasil dicatat!`);
+    setVisitors((prev) => [visitor, ...prev]);
+    showToast(`Presensi "${visitor.name}" berhasil dicatat & masuk ke Google Drive!`);
+    syncVisitorToGoogleDrive(DEFAULT_GDRIVE_SCRIPT_URL, visitor);
+  };
 
-    // Otomatis kirim ke Google Drive secara real-time
-    const gdriveUrl = localStorage.getItem('tbm_gdrive_script_url') || DEFAULT_GDRIVE_SCRIPT_URL;
-    if (gdriveUrl) {
-      syncVisitorToGoogleDrive(gdriveUrl, visitor).then((ok) => {
-        if (ok) {
-          showToast(`Presensi "${visitor.name}" tercatat & tersinkron ke Google Drive!`);
-        }
-      });
-    }
+  // Handler: Update Books (Otomatis langsung sinkron ke Google Drive)
+  const handleUpdateBooks = (newBooks) => {
+    setBooks(newBooks);
+    syncAllToGoogleDrive(DEFAULT_GDRIVE_SCRIPT_URL, visitors, newBooks, loans);
+  };
+
+  // Handler: Update Loans (Otomatis langsung sinkron ke Google Drive)
+  const handleUpdateLoans = (newLoans) => {
+    setLoans(newLoans);
+    syncAllToGoogleDrive(DEFAULT_GDRIVE_SCRIPT_URL, visitors, books, newLoans);
   };
 
   // Handler: Navigate to Labels from Book Catalog
@@ -149,22 +190,6 @@ export default function App() {
   // Handler: OPAC Search from Hero Section
   const handleOpacSearch = (query, category) => {
     setInitialBookSearch(query);
-  };
-
-  // Handler: Restore Data
-  const handleRestoreData = (imported) => {
-    if (imported.books) setBooks(imported.books);
-    if (imported.visitors) setVisitors(imported.visitors);
-    if (imported.loans) setLoans(imported.loans);
-    showToast('Data berhasil dipulihkan dari cadangan!');
-  };
-
-  // Handler: Reset Data
-  const handleResetData = () => {
-    setBooks(INITIAL_BOOKS);
-    setVisitors(INITIAL_VISITORS);
-    setLoans(INITIAL_LOANS);
-    showToast('Data direset kembali ke contoh awal.');
   };
 
   // Quick Visitor Form state
@@ -241,10 +266,6 @@ export default function App() {
           if (tab !== 'labels') setLabelPreselectedBook(null);
         }} 
         onOpenQuickVisitor={() => setIsQuickVisitorOpen(true)}
-        onOpenBackup={() => {
-          if (!isAdminLoggedIn) { setIsLoginModalOpen(true); return; }
-          setIsBackupModalOpen(true);
-        }}
         stats={stats}
         isAdminLoggedIn={isAdminLoggedIn}
         onOpenLogin={() => setIsLoginModalOpen(true)}
@@ -280,7 +301,7 @@ export default function App() {
         {activeTab === 'books' && (
           <BooksView 
             books={books} 
-            setBooks={setBooks} 
+            setBooks={handleUpdateBooks} 
             onNavigateToLabels={handleNavigateToLabels} 
             isAdmin={isAdminLoggedIn}
             onRequireLogin={() => setIsLoginModalOpen(true)}
@@ -297,9 +318,9 @@ export default function App() {
         {activeTab === 'circulation' && isAdminLoggedIn && (
           <CirculationView 
             loans={loans} 
-            setLoans={setLoans} 
+            setLoans={handleUpdateLoans} 
             books={books} 
-            setBooks={setBooks} 
+            setBooks={handleUpdateBooks} 
           />
         )}
 
@@ -512,15 +533,6 @@ export default function App() {
           </div>
         </div>
       )}
-
-      {/* Backup and Restore Modal */}
-      <DataBackupModal
-        isOpen={isBackupModalOpen}
-        onClose={() => setIsBackupModalOpen(false)}
-        allData={{ books, visitors, loans }}
-        onRestoreData={handleRestoreData}
-        onResetData={handleResetData}
-      />
 
       {/* Footer Resmi TBM Al Islamiyah */}
       <Footer setActiveTab={setActiveTab} />

@@ -23,7 +23,6 @@ export default function Navbar({
   activeTab, 
   setActiveTab, 
   onOpenQuickVisitor, 
-  onOpenBackup,
   stats,
   isAdminLoggedIn,
   onOpenLogin,
@@ -96,27 +95,22 @@ export default function Navbar({
               <span className="sm:hidden">Presensi</span>
             </button>
 
-            {/* MENU KHUSUS ADMIN (Tombol Database yang ditunjuk tanda panah user + Tombol Keluar) */}
+            {/* STATUS & LOGIN ADMIN */}
             {isAdminLoggedIn ? (
-              <div className="flex items-center gap-1.5 bg-emerald-950/40 p-0.5 rounded-lg border border-emerald-500/30">
-                {/* Tombol Database Backup & Sync (Hanya Tampil Saat Admin Login) */}
-                <button
-                  onClick={onOpenBackup}
-                  className="px-2.5 py-1.5 text-emerald-300 hover:text-white bg-[#143b82] hover:bg-[#1b489d] rounded-md transition-colors flex items-center gap-1.5 cursor-pointer text-xs font-bold"
-                  title="Database & Sinkronisasi Google Drive (Admin)"
-                >
-                  <Database className="w-4 h-4 text-emerald-400" />
-                  <span className="hidden md:inline">Database</span>
-                </button>
+              <div className="flex items-center gap-1.5">
+                <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-300 bg-emerald-950/70 px-2.5 py-1.5 rounded-lg border border-emerald-500/30">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span>Google Drive Aktif</span>
+                </span>
 
                 {/* Tombol Logout Admin */}
                 <button
                   onClick={onLogout}
-                  className="px-2 py-1.5 text-rose-300 hover:text-white hover:bg-rose-900/60 rounded-md transition-colors flex items-center gap-1 cursor-pointer text-xs font-semibold"
+                  className="px-2.5 py-1.5 text-rose-300 hover:text-white bg-rose-950/50 hover:bg-rose-900 border border-rose-500/30 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer text-xs font-semibold"
                   title="Keluar dari Akun Admin"
                 >
                   <LogOut className="w-3.5 h-3.5" />
-                  <span className="hidden lg:inline">Keluar</span>
+                  <span>Keluar</span>
                 </button>
               </div>
             ) : (
@@ -354,18 +348,12 @@ export default function Navbar({
             )}
           </button>
 
-          {/* Database Backup & Keluar di Mobile jika Admin */}
+          {/* Keluar di Mobile jika Admin */}
           {isAdminLoggedIn && (
             <div className="pt-2 mt-2 border-t border-white/10 space-y-1">
               <button
-                onClick={() => { onOpenBackup(); setMobileMenuOpen(false); }}
-                className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-emerald-300 bg-emerald-950/40 flex items-center gap-2"
-              >
-                <Database className="w-4 h-4 text-emerald-400" /> Database & Sinkronisasi GDrive
-              </button>
-              <button
                 onClick={() => { onLogout(); setMobileMenuOpen(false); }}
-                className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-rose-300 hover:bg-rose-950/40 flex items-center gap-2"
+                className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-rose-300 hover:bg-rose-950/40 flex items-center gap-2 cursor-pointer"
               >
                 <LogOut className="w-4 h-4" /> Keluar Akun Admin
               </button>
