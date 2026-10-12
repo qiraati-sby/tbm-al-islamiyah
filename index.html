@@ -2,15 +2,44 @@
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
     <title>TBM Al Islamiyah Surabaya | Taman Baca Masyarakat & Perpustakaan</title>
+    
+    <!-- PWA & Mobile Meta Tags -->
+    <meta name="theme-color" content="#0b2864" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="TBM Islamiyah" />
+    <meta name="description" content="Aplikasi Perpustakaan & Taman Baca Masyarakat Al Islamiyah Surabaya" />
+    
+    <!-- Icons & Manifest -->
+    <link rel="icon" type="image/png" href="./logo-tbm.png" />
+    <link rel="apple-touch-icon" href="./logo-tbm.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="./logo-tbm.png" />
   </head>
-  <body class="bg-slate-50 text-slate-800">
+  <body class="bg-slate-50 text-slate-800 antialiased selection:bg-emerald-500 selection:text-white">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then((reg) => {
+              console.log('PWA ServiceWorker terdaftar:', reg.scope);
+            })
+            .catch((err) => {
+              console.log('PWA ServiceWorker gagal:', err);
+            });
+        });
+      }
+    </script>
   </body>
 </html>

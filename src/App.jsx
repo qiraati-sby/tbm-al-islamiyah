@@ -7,6 +7,8 @@ import BookLabelsView from './components/BookLabelsView';
 import CirculationView from './components/CirculationView';
 import StatisticsView from './components/StatisticsView';
 import LoginModal from './components/LoginModal';
+import MobileBottomNav from './components/MobileBottomNav';
+import PwaInstallPrompt from './components/PwaInstallPrompt';
 import Footer from './components/Footer';
 import { INITIAL_BOOKS, INITIAL_VISITORS, INITIAL_LOANS, DEFAULT_GDRIVE_SCRIPT_URL } from './data/initialData';
 import { 
@@ -274,7 +276,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 lg:pb-6">
         {activeTab === 'dashboard' && (
           <DashboardView 
             books={books} 
@@ -364,7 +366,7 @@ export default function App() {
 
 
       {/* FLOATING LIVE CHAT / BANTUAN BUTTON (Tombol Bantuan Pojok Kanan Bawah) */}
-      <div className="no-print fixed bottom-5 right-5 z-40">
+      <div className="no-print fixed bottom-20 right-4 lg:bottom-5 lg:right-5 z-40">
         <button
           onClick={() => setIsHelpChatOpen(!isHelpChatOpen)}
           aria-label="Layanan Bantuan & Tanya Pustakawan"
@@ -542,6 +544,26 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Navigasi Khusus Layar HP / Mobile Bottom Bar */}
+      <MobileBottomNav 
+        activeTab={activeTab}
+        setActiveTab={(tab) => {
+          if (['books', 'visitors', 'labels', 'circulation'].includes(tab) && !isAdminLoggedIn) {
+            setIsLoginModalOpen(true);
+            return;
+          }
+          setActiveTab(tab);
+          if (tab !== 'labels') setLabelPreselectedBook(null);
+        }}
+        onOpenQuickVisitor={() => setIsQuickVisitorOpen(true)}
+        isAdminLoggedIn={isAdminLoggedIn}
+        onOpenLogin={() => setIsLoginModalOpen(true)}
+        stats={stats}
+      />
+
+      {/* Banner Pasang Aplikasi PWA di HP */}
+      <PwaInstallPrompt />
 
       {/* Footer Resmi TBM Al Islamiyah */}
       <Footer setActiveTab={setActiveTab} />

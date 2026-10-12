@@ -131,7 +131,7 @@ export default function Footer({ setActiveTab }) {
       </div>
 
       {/* Bottom Bar Strip */}
-      <div className="bg-[#051433] border-t border-[#0b2864] py-3.5 px-4 text-center text-xs text-slate-400">
+      <div className="bg-[#051433] border-t border-[#0b2864] py-3.5 pb-20 lg:pb-3.5 px-4 text-center text-xs text-slate-400">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <div>
             &copy; {new Date().getFullYear()} <b>TBM & PKBM Al Islamiyah Surabaya</b>. Seluruh Hak Cipta Dilindungi.

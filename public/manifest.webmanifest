@@ -1,0 +1,21 @@
+{
+  "name": "TBM Al Islamiyah Surabaya",
+  "short_name": "TBM Islamiyah",
+  "description": "Aplikasi Perpustakaan & Taman Baca Masyarakat Al Islamiyah Surabaya",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b2864",
+  "theme_color": "#0b2864",
+  "orientation": "portrait-primary",
+  "lang": "id",
+  "categories": ["education", "books", "utilities"],
+  "icons": [
+    {
+      "src": "./logo-tbm.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
